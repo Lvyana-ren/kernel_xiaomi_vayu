@@ -636,11 +636,12 @@ $($(subst $(obj)/,,$(@:.o=-objs)))    \
 $($(subst $(obj)/,,$(@:.o=-y)))       \
 $($(subst $(obj)/,,$(@:.o=-m)))), $^)
 
-cmd_link_multi-link = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
+cmd_link_multi-link = $(file >$@.link-deps,$(link_multi_deps)) \
+	$(LD) $(ld_flags) -r -o $@ @$@.link-deps $(cmd_secanalysis)
 
 quiet_cmd_link_multi-y = AR      $@
-cmd_link_multi-y = $(update_lto_symversions) \
-	rm -f $@; $(AR) rcSTP$(KBUILD_ARFLAGS) $@ $(link_multi_deps) \
+cmd_link_multi-y = $(file >$@.link-deps,$(link_multi_deps)) \
+	rm -f $@; $(AR) rcSTP$(KBUILD_ARFLAGS) $@ @$@.link-deps \
 	$(update_lto_symtable)
 
 quiet_cmd_link_multi-m = LD [M]  $@
@@ -657,7 +658,7 @@ $(multi-used-y): FORCE
 
 $(multi-used-m): FORCE
 	$(call if_changed,link_multi-m)
-	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
+	@{ echo $(@:.o=.ko); cat $@.link-deps; \
 	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
 
 $(call multi_depend, $(multi-used-y), .o, -objs -y)
