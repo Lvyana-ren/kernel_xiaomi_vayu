@@ -638,15 +638,10 @@ $($(subst $(obj)/,,$(@:.o=-m)))), $^)
 
 cmd_link_multi-link = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
 
-ifdef CONFIG_THIN_ARCHIVES
-  quiet_cmd_link_multi-y = AR      $@
-  cmd_link_multi-y = $(update_lto_symversions) \
+quiet_cmd_link_multi-y = AR      $@
+cmd_link_multi-y = $(update_lto_symversions) \
 	rm -f $@; $(AR) rcSTP$(KBUILD_ARFLAGS) $@ $(link_multi_deps) \
 	$(update_lto_symtable)
-else
-  quiet_cmd_link_multi-y = LD      $@
-  cmd_link_multi-y = $(cmd_link_multi-link)
-endif
 
 quiet_cmd_link_multi-m = LD [M]  $@
 
